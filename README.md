@@ -453,7 +453,7 @@ normally, when you deploy a UUPS upgradeable contract you only call the initiali
 
 #### why UUPS is much more gas efficient than Transparency upgradeable pattern
 
-// todo try it in forge
+UUPS proxy contract is much smaller than transparent upgradeable contract. but since the upgrade logic has shifted to logic contact, the UUPS logic contract is much larger than transparent upgradeable logic contract. In generial, UUPS is much gas efficient with one proxy contract and a logic contract. However consider the logic contract can be upgraded more than once, UUPS is not that much gas efficient as introduced.
 
 #### why can't dynamically change the length of an array store in memory
 
@@ -464,6 +464,40 @@ the size of array in memory have to be preallocated like this
 #### how to make sure that initialize() is called only once in openzeppelin
 
 by checking `address(this).code.length == 0` to make sure the calling is issued from a constructor. This mechanism save a storage variable representing whether the contract is initialized. On the other hand onlyDelegate modifier is introduced to prevent the logic contract controlled by malicious account and got self-destructed.
+
+#### how storage automatically packed in solidity
+
+All primitive types < 32 bytes that are declared adjacent, even across inherited contracts, can pack with each other, this includes:
+
++ Integers:
+   + uint8-uint248
+   + int8-int248
++ Fixed-width bytes:
+   + bytes1-bytes31
++ bools
++ enums
+
+non-primitive type (structs, arrays, mappings, etc) of storage variable will interrupt the packing allocation (S) and will assign that variable to a new slot (S+1)
+
+uncover slot and offset by using assembly
+```solidity
+uint64 _u64;
+address _a160;
+
+// Returns (0, 8)
+function getAddressSlotAndOffset() external pure
+    returns (uint256 slot, uint8 offset)
+{
+    assembly {
+        slot := _a160.slot     // 0
+        offset := _a160.offset // 8
+    }
+}
+```
+
+Tips:
+
+Choose types that realistically match the range of values they will hold. For example, if you are tracking an absolute, real quantity of ETH, USDC, etc, the uint256 type is probably wasting bits you will never need and you could probably get away with a uint128 or even uint96. For timestamps, a uint40 can represent 34,000+ years in seconds
 
 ### attacks
 
