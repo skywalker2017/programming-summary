@@ -461,6 +461,10 @@ It's originate from the way the data stored in memory one after another, and the
 the size of array in memory have to be preallocated like this
 `bytes memory newBytes = new bytes(10);`
 
+#### how to make sure that initialize() is called only once in openzeppelin
+
+by checking `address(this).code.length == 0` to make sure the calling is issued from a constructor. This mechanism save a storage variable representing whether the contract is initialized. On the other hand onlyDelegate modifier is introduced to prevent the logic contract controlled by malicious account and got self-destructed.
+
 ### attacks
 
 #### gas griefing
