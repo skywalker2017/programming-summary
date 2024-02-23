@@ -381,13 +381,26 @@ fallback() external payable {
 
 #### how to retrieve the revert error message
 
-reverted error message is encoded in abi, the first 4-byte indicate the error selector, the following 32 bytes indicate the start offset the error message represented in bytes. The next 32 bytes is the message it self, so you can use the following assembly code to retrieve the error message
+reverted error message is encoded in abi, the first 4-byte indicate the error selector, the following 32 bytes indicate the start offset the error message represented in bytes. The next 32 bytes is the length of the msg, so you can use the following assembly code to retrieve the error message
 ```
 bytes memory revertReason;
  assembly {
     revertReason := add(_msg, 68)
 }
 ```
+or you can revert the raw bytes in assembly, it's much cheaper. 32 means skip the fisrt byte32 which represent the length
+```solidity
+(bool success, bytes memory data) = address(mustRevert).call(abi.encodeWithSignature("mustRevert(uint256)", _case));
+assembly {
+   revert(
+      // Start of revert data bytes. The 0x20 offset is always the same.
+      add(data, 32),
+      // Length of revert data.
+      mload(data)
+      )
+   }
+```
+compared with the code in Proxy.sol, it doesn't add 32-bytes because the result of assembly call didn't experience abi encode.
 
 #### RLP encoding rules
 
