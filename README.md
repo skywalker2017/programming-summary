@@ -499,6 +499,10 @@ Tips:
 
 Choose types that realistically match the range of values they will hold. For example, if you are tracking an absolute, real quantity of ETH, USDC, etc, the uint256 type is probably wasting bits you will never need and you could probably get away with a uint128 or even uint96. For timestamps, a uint40 can represent 34,000+ years in seconds
 
+#### limitation of using assembly return/revert and modifier
+
+the code after "_" in modifier can normally run with solidity return/revert, but by using assembly, the code after "_" can't run
+
 ### attacks
 
 #### gas griefing
