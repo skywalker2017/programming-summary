@@ -382,6 +382,7 @@ fallback() external payable {
 #### how to retrieve the revert error message
 
 reverted error message is encoded in abi, the first 4-byte indicate the error selector, the following 32 bytes indicate the start offset the error message represented in bytes. The next 32 bytes is the length of the msg, so you can use the following assembly code to retrieve the error message
+// todo this code is not efficient enouge, try another one
 ```
 bytes memory revertReason;
  assembly {
@@ -501,7 +502,16 @@ Choose types that realistically match the range of values they will hold. For ex
 
 #### limitation of using assembly return/revert and modifier
 
-the code after "_" in modifier can normally run with solidity return/revert, but by using assembly, the code after "_" can't run
+the code following "_" in modifier can normally executed if surrounding solidity return, but it won't with assembly return
++ solution: pre-claim the variable that would return instead of using return directly
+  ```solidity
+  function _assCall() internal printGas() returns (uint256 result){
+     assembly{
+      ...
+      result := mload(0)
+     }
+  }
+   ```
 
 ### attacks
 
