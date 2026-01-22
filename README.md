@@ -20,6 +20,7 @@ solidity grammer, vulnerabilities, EIPs
 + upgrading logic should be included in implementation contract by importing UUPSUpgradeable.sol
 + we can modify the authority of upgrading by override _authorizeUpgrade function
 + the address of logic contract is stored in the specific slot of proxy contract storage space.
++ why there is an initialize function to replace construct in implementation: because the construct funcion is called only when the contract deployed, and it won't init the storage of proxy contract, so we need another funtion to init the storage of the proxy contract 
 
 ### DEX-Uninswap
 
